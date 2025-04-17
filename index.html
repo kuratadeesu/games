@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ドラクエ風ゲームver1</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <style>
+    body {font-family: 'Courier New', monospace; background: #222; color: #fff; padding: 20px;}
+    .log {margin-top: 10px;}
+    .command {margin-top: 10px;}
+    .command button {margin-top: 10px;}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div>
+      <p>[勇者] HP: {{ player.hp }}</p>
+      <p>[{{ enemy.name}}] HP: {{ enemy.hp }}</p>
+    </div>
+
+    <div class="command" v-if="!isBattleOver">
+      <p>どうする？</p>
+      <button @click="attack">たたかう</button>
+      <button @click="run">にげる</button>
+    </div>
+
+    <div class="log">
+      <p v-for="(log, index) in logs" :key="index">＞ {{ log }}</p>
+    </div>
+
+    <div v-if="isBattleOver">
+      <p>{{ resultMessage }}</p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        player: { hp: 10},
+        enemy: { name: 'スライム', hp: 20},
+        logs: [],
+        isBattleOver: false,
+        resultMessage: ''
+      },
+      methods: {
+        attack() {
+          const playerDmg = Math.floor(Math.random() * 5) + 3;
+          const enemyDmg = Math.floor(Math.random() * 4) + 2;
+
+          this.enemy.hp -= playerDmg;
+          this.logs.push(`勇者は ${playerDmg} のダメージをあたえた！`);
+
+          if(this.enemy.hp <= 0) {
+            this.enemy.hp = 0;
+            this.endBattle(`勝利！スライムをたおした！`);
+            return;
+          }
+
+          this.player.hp -= enemyDmg;
+          this.logs.push(`${this.enemy.name}のこうげき！ ${enemyDmg} のダメージ！`);
+
+          if(this.player.hp <= 0) {
+            this.player.hp = 0;
+            this.endBattle(`敗北．．．勇者は倒れてしまった！`);
+            return;
+          }
+        },
+        run() {
+          this.endBattle(`勇者は逃げ出した！`)
+        },
+        endBattle(message) {
+          this.resultMessage = message;
+          this.isBattleOver = true;
+        }
+      }
+    });
+
+  </script>
+</body>
+</html>
